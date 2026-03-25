@@ -1,32 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon Sentinel Lock Screen</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main id="app">
-      <div class="scene">
-        <canvas id="sceneCanvas" width="1080" height="1920"></canvas>
-        <div class="scan-line"></div>
-        <div class="pulse"></div>
-        <div class="matrix-overlay"></div>
-        <p class="fallback" role="alert">
-          Drop your artwork into <code>assets/lock-subject.png</code> and reload.
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saints Ink Tattoo | Marcos Honnes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #e5e5e5;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .gold-border {
+      border-color: #c5a059;
+    }
+
+    .gold-text {
+      color: #c5a059;
+    }
+
+    #circuit-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .consultation-link,
+    .forge-link {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      border: 1px solid rgb(38 38 38);
+      border-radius: 0.375rem;
+      background: black;
+      text-align: center;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .consultation-link:hover,
+    .forge-link:hover {
+      background: rgb(23 23 23);
+      border-color: #c5a059;
+    }
+  </style>
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+  <canvas id="circuit-bg"></canvas>
+
+  <div class="content-wrap w-full flex flex-col items-center">
+    <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold tracking-tighter uppercase mb-2">🔥Marcos 'Practices' Honnes🔥</h1>
+      <p class="text-xl italic gold-text">Tattoo Artist | Systems Builder (850) 776-2260 </p>
+    </header>
+
+    <main class="max-w-md w-full bg-neutral-900 p-8 rounded-lg border-t-4 gold-border shadow-2xl">
+      <h2 class="text-2xl font-semibold mb-4 text-white">At last... the Billet takes Shape</h2>
+
+      <p class="mb-6 leading-relaxed">
+       || 🔥BEHOLD🔥 || You have stepped foot onto the very first bricks being laid🧱⛏️ But I will not bore you with lore, trust me I know what you came here for. Return back from time to time, and check out if I've yet built some more😉 Porfolio and ways to contact me in the link below. If you're interested in designing your own tattoo. "The Forge" is a prompt generator I once built that has been designed to reward ambiguity. Just answer each question as prompted, or don't lol. If you wanna say, "Chicano Script', 'Ocean Wave" for your script style. I encourage you too. Seriously, I asked it once what a whales dream was like 🤯 copy the outputted prompt, take to an AI, I use Gemini most of the time, generates quick, free, And a crazy great image and video generating model.⚙️
+      </p>
+
+      <div class="space-y-4">
+        <div class="bg-black p-4 rounded border border-neutral-800">
+          <p class="text-sm uppercase tracking-widest gold-text mb-1">Status</p>
+          <p class="font-mono">ARTIST IN SESSION</p>
+        </div>
+
+        <a
+          href="https://www.instagram.com/marcos.honnes/"
+          target="_blank"
+          class="consultation-link gold-text"
+        >
+          SEND CONSULTATION REQUEST
+        </a>
+
+        <a href="inkception.html" class="forge-link gold-text">
+          ⚒️ ENTER THE FORGE ⚒️
+        </a>
+
+        <p class="text-xs text-center text-neutral-500 mt-4">
+          Include: Concept, Placement, Size. <br />
+          I'll reply during my next break.
         </p>
       </div>
-      <section class="controls">
-        <button id="startAnimation" type="button">🔁 Replay Animation</button>
-        <button id="recordClip" type="button">⬇️ Export 6s Video</button>
-        <p class="hint">
-          Place your image at <code>assets/lock-subject.png</code>. Use Export to
-          generate a video lock screen (WebM). Convert to MP4/Live Photo if
-          needed.
-        </p>
-      </section>
     </main>
-    <script type="module" src="scripts/app.js"></script>
-  </body>
+
+    <footer class="mt-12 text-neutral-600 text-sm text-center">
+      &copy; 2026 Saints Ink Tattoo. No Bullshit. Just Art.
+    </footer>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("circuit-bg");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const lines = [];
+
+    for (let i = 0; i < 60; i++) {
+      lines.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        length: 40 + Math.random() * 100,
+        angle: Math.random() * Math.PI * 2,
+        speed: 0.15 + Math.random() * 0.25
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "rgba(255, 215, 0, 0.06)";
+      ctx.lineWidth = 1;
+
+      lines.forEach((line) => {
+        const dx = Math.cos(line.angle) * line.length;
+        const dy = Math.sin(line.angle) * line.length;
+
+        ctx.beginPath();
+        ctx.moveTo(line.x, line.y);
+        ctx.lineTo(line.x + dx, line.y + dy);
+        ctx.stroke();
+
+        line.x += Math.cos(line.angle) * line.speed;
+        line.y += Math.sin(line.angle) * line.speed;
+
+        if (
+          line.x < -line.length ||
+          line.x > canvas.width + line.length ||
+          line.y < -line.length ||
+          line.y > canvas.height + line.length
+        ) {
+          line.x = Math.random() * canvas.width;
+          line.y = Math.random() * canvas.height;
+          line.angle = Math.random() * Math.PI * 2;
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
 </html>

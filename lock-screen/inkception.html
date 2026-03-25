@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ink-Ception V4 (Final)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #020403;
+      --panel: #050908;
+      --accent: #34ff8f;
+      --accent-soft: #1a3b2a;
+      --danger: #ff4b81;
+      --text-main: #e5ffe9;
+      --text-dim: #7affb0;
+      --mono: "Fira Code","JetBrains Mono",Menlo,Monaco,Consolas,monospace;
+
+      --codex-open: 280px;
+      --codex-closed: 38px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top,#04140a 0,#000 40%,#000 100%);
+      color: var(--text-main);
+      font-family: var(--mono);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ======================================================
+       V4 MAIN CONTAINER
+       ====================================================== */
+    main-container {
+      display: flex;
+      width: 100%;
+      max-width: 1280px;
+      height: 100vh;
+      overflow: hidden;
+      border: 1px solid var(--accent-soft);
+      background: linear-gradient(145deg,var(--panel),#000000);
+      box-shadow: 0 0 30px #00ff8844;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    /* ======================================================
+       V4 CODEX SIDEBAR
+       ====================================================== */
+    codex-sidebar {
+      width: var(--codex-open);
+      transition: width 0.28s ease;
+      border-right: 1px solid var(--accent-soft);
+      background: #030804;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 8;
+    }
+
+    codex-sidebar.collapsed {
+      width: var(--codex-closed);
+    }
+
+    .codex-toggle {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--accent-soft);
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+    }
+
+    .codex-content {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      opacity: 0.88;
+      background: repeating-linear-gradient(
+        135deg,#021008 0,#021008 8px,#03150a 8px,#03150a 16px
+      );
+      white-space: pre-wrap;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    /* ======================================================
+       CENTRAL TERMINAL
+       ====================================================== */
+    central-terminal {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 5;
+    }
+
+    system-footer {
+      height: 36px;
+      border-top: 1px solid var(--accent-soft);
+      display: flex;
+      align-items: center;
+      font-size: 10px;
+      padding: 0 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      background: #020805;
+      z-index: 7;
+    }
+
+    /* ======================================================
+       ORIGINAL V3.1 SHELL CSS (UNMODIFIED)
+       ====================================================== */
+    .frame {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 12px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shell {
+      border: 1px solid var(--accent-soft);
+      background: linear-gradient(145deg,var(--panel),#000);
+      box-shadow: 0 0 30px #00ff8844;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 24px);
+      max-height: 900px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .shell-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      z-index: 3;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      display: inline-block;
+    }
+
+    /* BUTTONS */
+    .mini-btn {
+      border-radius: 100px;
+      border: 1px solid var(--accent-soft);
+      padding: 3px 8px;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      cursor: pointer;
+      background: #020805;
+      color: var(--text-dim);
+    }
+
+    .mini-btn-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 8px #00ff8844;
+    }
+
+    .shell-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    #script-preview {
+      border-radius: 6px;
+      border: 1px dashed var(--accent-soft);
+      background: #020805;
+      padding: 8px;
+      font-size: 18px;
+      line-height: 1.4;
+      text-align: center;
+      font-family: "Segoe Script","Brush Script MT",cursive;
+      color: var(--text-main);
+      min-height: 52px;
+      white-space: pre-wrap;
+    }
+
+    #chat-log {
+      flex: 1;
+      border-radius: 6px;
+      background: radial-gradient(circle at top left,#04180c 0,#020302 45%);
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .shell-footer {
+      border-top: 1px solid var(--accent-soft);
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    #user-input {
+      flex: 1;
+      border-radius: 4px;
+      border: 1px solid var(--accent-soft);
+      background: #000;
+      color: var(--text-main);
+      padding: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+      outline: none;
+    }
+    button {
+      border-radius: 4px;
+      border: 1px solid var(--accent);
+      background: #02170a;
+      color: var(--accent);
+      padding: 8px 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 0 10px #00ff8844 inset;
+    }
+
+    .pill {
+      border-radius: 100px;
+      border: 1px solid var(--accent-soft);
+      padding: 2px 6px;
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    #progress-pill {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .msg-block {
+      margin-bottom: 10px;
+    }
+
+    .msg-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0.6;
+      margin-bottom: 2px;
+    }
+
+    .msg {
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .msg-system  { color: var(--text-dim); }
+    .msg-bot     { color: var(--accent); }
+    .msg-user    { color: var(--text-main); }
+
+    .brief-block {
+      border: 1px solid var(--accent-soft);
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 6px;
+      background: #020805;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    /* ======================================================
+       V4 ANIMATION LAYER
+       ====================================================== */
+    @keyframes idleGlowPulse {
+      0%   { box-shadow: 0 0 20px #00ff8855; }
+      50%  { box-shadow: 0 0 36px #00ff8899; }
+      100% { box-shadow: 0 0 20px #00ff8855; }
+    }
+
+    @keyframes processingGlowPulse {
+      0%   { box-shadow: 0 0 0px #00ff8866; }
+      40%  { box-shadow: 0 0 42px #00ff88cc; }
+      100% { box-shadow: 0 0 14px #00ff8855; }
+    }
+
+    .shell-idle {
+      animation: idleGlowPulse 5s ease-in-out infinite;
+    }
+
+    .shell-processing {
+      animation: processingGlowPulse 1.8s ease-out;
+    }
+
+    /* ======================================================
+       V4 MOBILE LAYOUT
+       ====================================================== */
+    @media (max-width: 480px) {
+      html, body { overflow-x: hidden; }
+
+      main-container {
+        flex-direction: column;
+        border-radius: 0;
+        height: 100vh;
+        max-width: 100%;
+      }
+
+      codex-sidebar {
+        width: 100% !important;
+        border-right: none;
+        border-top: 1px solid var(--accent-soft);
+        max-height: 40vh;
+        order: 3;
+      }
+
+      codex-sidebar.collapsed {
+        max-height: 42px;
+      }
+
+      central-terminal { order: 1; }
+
+      system-footer { order: 4; font-size: 9px; padding: 0 6px; }
+
+      .frame { max-width: 100%; padding: 8px; }
+
+      .shell { height: calc(100vh - 80px); }
+
+      .input-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .input-row button { width: 100%; }
+    }
+  
+/* MOBILE FIX OVERRIDE */
+@media (max-width: 480px) {
+  html, body {
+    overflow-x: hidden;
+    height: 100%;
+  }
+  body {
+    display: block;
+  }
+  main-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100%;
+    border-radius: 0;
+    max-width: 100%;
+  }
+  codex-sidebar {
+    width: 100% !important;
+    border-right: none;
+    border-top: 1px solid var(--accent-soft);
+    max-height: 32vh;
+    min-height: 42px;
+    overflow-y: auto;
+    order: 3;
+  }
+  codex-sidebar.collapsed {
+    max-height: 42px;
+    overflow: hidden;
+  }
+  central-terminal {
+    order: 1;
+    flex: 1;
+    min-height: 58vh;
+  }
+  .frame {
+    max-width: 100%;
+    padding: 8px;
+    height: auto;
+    min-height: calc(100vh - 140px);
+  }
+  .shell {
+    height: auto;
+    min-height: calc(100vh - 180px);
+    max-height: none;
+  }
+  .shell-body {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 40vh;
+  }
+  .input-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .input-row button {
+    width: 100%;
+  }
+  system-footer {
+    order: 4;
+    font-size: 9px;
+    padding: 4px 6px;
+    height: auto;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<main-container>
+
+<!-- ======================================================
+     V4 CODEX SIDEBAR WITH FINAL CONTENT
+     ====================================================== -->
+<codex-sidebar id="codex">
+  <div class="codex-toggle" id="codexToggle">CODEX</div>
+
+  <div class="codex-content" id="codexContent">
+FLOW TYPES  
+────────────────────────  
+• Straight Baseline – rigid, minimal, clean.  
+• Soft Arch – gentle rise, sentimental tone.  
+• Deep Arch – dramatic emphasis arc.  
+• S-Curve – flowing, organic, universally forgiving.  
+• Wave Flow – rhythmic elevation and drop.  
+• Diagonal Rise – assertive upward energy.  
+• Diagonal Fall – somber downward tone.  
+• Radiant Burst – center radiating outward.  
+
+  
+COMPOSITION TEMPLATES  
+────────────────────────  
+• Golden Spiral – elegant curve for emotional phrases.  
+• S-Curve – default for script harmony.  
+• Pyramid Stack – strong central emphasis.  
+• Rule of Thirds – balanced, photographic logic.  
+• Double Diagonal – tension and dynamic direction.  
+• Radiating Center – symbolic, devotional layouts.  
+• Vertical Flow – ribs, sternum, spine placement.  
+• Horizontal Flow – forearms, collarbone.  
+
+  
+SCRIPT STYLES  
+────────────────────────  
+• Chicano Script – flourished capitals, emotional weight.  
+• Minimal Script – thin, modern, breathable.  
+• Gothic / Blackletter – authoritative, sharp geometry.  
+• Calligraphy – graceful ink-stroke emphasis.  
+• Old English – historic weight, ornamental serifs.  
+• Clean Sans Script – quiet, modern lettering.  
+
+  
+BODY ZONES  
+────────────────────────  
+• Forearm – horizontal flow, medium contrast.  
+• Bicep – flexible, neutral curvature.  
+• Chest – wide arcs, requires added spacing.  
+• Ribs – vertical flow, pain-zone spacing boost.  
+• Sternum – narrow vertical paths, breathing space required.  
+• Collarbone – curved baseline, gentle arcs.  
+• Wrist – tight spacing, minimal flourishes.  
+
+  
+AGING / SPACING  
+────────────────────────  
+• Add 2–3% letter spacing for long-term clarity.  
+• Add 3% flourish spacing to prevent merging.  
+• Avoid curl-overlap on long swashes.  
+• Increase negative space for ribs/chest/sternum.  
+• Favor simpler capitals for small zones.  
+• Preserve readability over ornament.  
+
+  
+ARTIST TIPS  
+────────────────────────  
+• Always prioritize readability over decoration.  
+• Match composition to body flow, not the other way around.  
+• Respect the client’s natural posture.  
+• Avoid over-stacking lines unless intentional.  
+• Add breathing room around emotional words.  
+• Let flourishes “escape” outward, not inward.  
+  </div>
+</codex-sidebar>
+
+
+<!-- ======================================================
+     CENTRAL TERMINAL (V3.1 CORE PRESERVED)
+     ====================================================== -->
+<central-terminal>
+
+  <div class="frame">
+    <div class="shell" id="mainShell">
+
+      <div class="shell-header">
+        <div class="status-left">
+          <span class="status-dot"></span>
+          <span>INK-CEPTION // V3.1</span>
+        </div>
+        <div class="shell-header-right">
+          <span id="mode-label">MODE: CONCEPT</span>
+          <button class="mini-btn mini-btn-active" id="btn-mode-concept">CONCEPT</button>
+          <button class="mini-btn" id="btn-mode-script">SCRIPT</button>
+          <button class="mini-btn" id="reset-btn">NEW</button>
+        </div>
+      </div>
+
+      <div class="shell-body">
+        <div id="script-preview" class="hidden empty">
+          [ Script layout will appear here in SCRIPT mode ]
+        </div>
+        <div id="chat-log"></div>
+      </div>
+
+      <div class="shell-footer">
+        <div class="input-row">
+          <input id="user-input" type="text" autocomplete="off"
+            placeholder="Type and hit Enter..." />
+          <button id="send-btn">Send</button>
+          <button id="copy-btn">Copy Output</button>
+        </div>
+        <div class="hint-row">
+          <div class="pill" id="hint-pill">Concept mode: talk like a real client.</div>
+          <div class="pill">Output: Artist Brief + AI Prompt</div>
+          <div class="pill" id="progress-pill">Step 0/7</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</central-terminal>
+
+<system-footer>
+  V4 FINAL ACTIVE — 3.1 CORE PRESERVED
+</system-footer>
+
+</main-container>
+<!-- ======================================================
+     ORIGINAL V3.1 JS (PRESERVED)
+     ====================================================== -->
+<script>
+// =========================
+// MODES + STATE
+// =========================
+const chatLog = document.getElementById("chat-log");
+const userInput = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
+const copyBtn = document.getElementById("copy-btn");
+const resetBtn = document.getElementById("reset-btn");
+const progressPill = document.getElementById("progress-pill");
+const modeLabel = document.getElementById("mode-label");
+const hintPill = document.getElementById("hint-pill");
+const btnModeConcept = document.getElementById("btn-mode-concept");
+const btnModeScript = document.getElementById("btn-mode-script");
+const scriptPreview = document.getElementById("script-preview");
+
+const MODES = {
+  concept: {
+    key: "concept",
+    label: "CONCEPT",
+    steps: ["idea","style","placement","size","color","budget","name"],
+    data: {
+      idea: "",
+      style: "",
+      placement: "",
+      size: "",
+      color: "",
+      budget: "",
+      name: ""
+    }
+  },
+  script: {
+    key: "script",
+    label: "SCRIPT",
+    steps: [
+      "phrase",
+      "layout",
+      "emphasis",
+      "style",
+      "flow",
+      "placement",
+      "size",
+      "color",
+      "name"
+    ],
+    data: {
+      phrase: "",
+      layout: "",
+      emphasis: "",
+      style: "",
+      flow: "",
+      placement: "",
+      size: "",
+      color: "",
+      name: ""
+    }
+  }
+};
+
+let activeModeKey = "concept";
+let sessionActive = false;
+let currentStepIndex = -1;
+let lastOutputText = "";
+
+// =========================
+// HELPERS
+// =========================
+function getMode() {
+  return MODES[activeModeKey];
+}
+
+function appendMessage(text, type = "bot") {
+  const block = document.createElement("div");
+  block.className = "msg-block";
+
+  const tag = document.createElement("div");
+  tag.className = "msg-tag";
+  tag.textContent =
+    type === "bot"
+      ? "AGENT"
+      : type === "user"
+      ? "CLIENT"
+      : "SYSTEM";
+
+  const msg = document.createElement("div");
+  msg.className =
+    "msg " +
+    (type === "bot"
+      ? "msg-bot"
+      : type === "user"
+      ? "msg-user"
+      : "msg-system");
+  msg.textContent = text;
+
+  block.appendChild(tag);
+  block.appendChild(msg);
+  chatLog.appendChild(block);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function appendBrief(briefText, promptText, labelOverride) {
+  const block = document.createElement("div");
+  block.className = "msg-block";
+
+  const tag = document.createElement("div");
+  tag.className = "msg-tag";
+  tag.textContent = "OUTPUT";
+
+  const label = document.createElement("div");
+  label.className = "msg msg-bot";
+  label.textContent = labelOverride || "Professional Artist Brief generated.";
+
+  const box = document.createElement("div");
+  box.className = "brief-block";
+  box.textContent = briefText + "\n\nAI PROMPT:\n" + promptText;
+
+  block.appendChild(tag);
+  block.appendChild(label);
+  block.appendChild(box);
+  chatLog.appendChild(block);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function updateProgress() {
+  const mode = getMode();
+  const total = mode.steps.length;
+  let stepNumber = 0;
+
+  if (!sessionActive && lastOutputText) {
+    stepNumber = total;
+  } else if (sessionActive) {
+    stepNumber = Math.min(currentStepIndex + 1, total);
+  }
+
+  progressPill.textContent = `Step ${stepNumber}/${total}`;
+}
+
+function clearAllData() {
+  Object.values(MODES).forEach(mode => {
+    Object.keys(mode.data).forEach(k => {
+      mode.data[k] = "";
+    });
+  });
+}
+
+function sanitizeScriptLines() {
+  const data = MODES.script.data;
+  const raw = data.layout || data.phrase || "";
+  const lines = raw
+    .split("|")
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
+  return lines;
+}
+
+function updateScriptPreview() {
+  if (!scriptPreview) return;
+
+  if (activeModeKey !== "script") {
+    scriptPreview.classList.add("hidden");
+    scriptPreview.textContent = "";
+    scriptPreview.classList.add("empty");
+    return;
+  }
+
+  scriptPreview.classList.remove("hidden");
+  const lines = sanitizeScriptLines();
+
+  if (lines.length === 0) {
+    scriptPreview.classList.add("empty");
+    scriptPreview.textContent =
+      "[ Script layout will appear here in SCRIPT mode ]";
+  } else {
+    scriptPreview.classList.remove("empty");
+    scriptPreview.textContent = lines.join("\n");
+  }
+}
+
+function setMode(newModeKey) {
+  if (activeModeKey === newModeKey) return;
+
+  activeModeKey = newModeKey;
+  modeLabel.textContent = `MODE: ${getMode().label}`;
+
+  btnModeConcept.classList.toggle("mini-btn-active", activeModeKey === "concept");
+  btnModeScript.classList.toggle("mini-btn-active", activeModeKey === "script");
+
+  if (activeModeKey === "concept") {
+    hintPill.textContent = "Concept mode: talk like a real client.";
+  } else {
+    hintPill.textContent = "Script mode: type exact phrase + layout.";
+  }
+
+  clearAllData();
+  sessionActive = false;
+  currentStepIndex = -1;
+  lastOutputText = "";
+  updateProgress();
+  updateScriptPreview();
+
+  appendMessage(
+    activeModeKey === "concept"
+      ? "Switched to CONCEPT mode ›› Start by typing the tattoo idea."
+      : "Switched to SCRIPT mode ›› Start by typing the exact phrase you want tattooed.",
+    "system"
+  );
+}
+
+function resetSession() {
+  clearAllData();
+  sessionActive = false;
+  currentStepIndex = -1;
+  lastOutputText = "";
+  updateProgress();
+  chatLog.innerHTML = "";
+  updateScriptPreview();
+  bootMessage();
+}
+
+// =========================
+// QUESTIONS PER MODE
+// =========================
+function getQuestion(stepKey) {
+  if (activeModeKey === "concept") {
+    const questions = {
+      idea: "Describe the core idea or meaning behind this tattoo.",
+      style:
+        "What style are you feeling? (e.g. American Traditional, Neo-trad, Realism, Chicano, Script)",
+      placement:
+        "Where on the body is this going? (e.g. inner forearm, outer bicep, chest, ribs)",
+      size:
+        "How big roughly? Use inches or words like 'small wrist piece', 'half sleeve', etc.",
+      color:
+        "Color or black & grey? You can also say 'mixed' if you want color accents.",
+      budget:
+        "What’s your ideal budget range for this piece? (Rough numbers are enough.)",
+      name:
+        "What name should I put on the brief as the client? (Your name or a nickname.)"
+    };
+    return questions[stepKey] || "";
+  } else {
+    const questions = {
+      phrase:
+        "What EXACT phrase should this tattoo say? Please check spelling and punctuation.",
+      layout:
+        "How should it be stacked? Use | to separate lines. Example: FOREVER IN | MY HEART",
+      emphasis:
+        "Any words that should be larger or main focus? If none, type 'none'.",
+      style:
+        "Script style? (e.g. Chicano, Gothic, Minimal script, Calligraphy, Old English, etc.)",
+      flow:
+        "How should the lines flow? (Straight, arched, diagonal, wave, etc.)",
+      placement:
+        "Where on the body is this going? (e.g. inner forearm, chest, ribs, sternum)",
+      size:
+        "How big roughly? You can use inches or words like 'small script over wrist', 'across chest', etc.",
+      color:
+        "Black & grey, full color, or mixed accents?",
+      name:
+        "What name should I put on the brief as the client? (Your name or a nickname.)"
+    };
+    return questions[stepKey] || "";
+  }
+}
+
+function askNextQuestion() {
+  const mode = getMode();
+  const stepKey = mode.steps[currentStepIndex];
+  const q = getQuestion(stepKey);
+  if (q) appendMessage(q, "bot");
+}
+</script>
+<script>
+// =========================
+// OUTPUT GENERATION (V3.1 — UNMODIFIED)
+// =========================
+function generateConceptOutput() {
+  const data = MODES.concept.data;
+  const { idea, style, placement, size, color, budget, name } = data;
+  const cleanName = name || "Client";
+
+  const brief =
+    `CLIENT: ${cleanName}\n` +
+    `CORE IDEA: ${idea}\n` +
+    `STYLE: ${style || "Not specified"}\n` +
+    `PLACEMENT: ${placement || "Not specified"}\n` +
+    `APPROX SIZE: ${size || "Not specified"}\n` +
+    `COLOR PALETTE: ${color || "Not specified"}\n` +
+    `BUDGET RANGE: ${budget || "Not specified"}\n\n` +
+    `SUMMARY: ${cleanName} is requesting a ${size || "custom"} tattoo in the style of ${
+      style || "custom"
+    } on the ${placement || "chosen area"}. ` +
+    `The piece should reflect: ${idea}. Preferred palette: ${
+      color || "to be decided"
+    }. Target budget: ${budget || "TBD"}.`;
+
+  const prompt =
+    `high-detail tattoo design, ${style || "professional tattoo flash"} style, ` +
+    `${color || "black and grey"}, placement: ${placement || "body part"}, ` +
+    `visualizing: "${idea}", clean linework, balanced composition, ` +
+    `no background, tattoo flash sheet, neutral lighting`;
+
+  lastOutputText = brief + "\n\nAI PROMPT:\n" + prompt;
+
+  appendBrief(brief, prompt);
+}
+
+function generateScriptOutput() {
+  const data = MODES.script.data;
+  const {
+    phrase,
+    emphasis,
+    style,
+    flow,
+    placement,
+    size,
+    color,
+    name
+  } = data;
+
+  const cleanName = name || "Client";
+  const cleanPhrase = phrase || "(phrase not provided)";
+  const lines = sanitizeScriptLines();
+
+  let layoutPreview = lines.length > 0 ? lines.join("\n") : cleanPhrase;
+
+  const emphasisText =
+    emphasis && emphasis.toLowerCase() !== "none"
+      ? emphasis
+      : "No specific emphasis; treat all words consistently unless artist decides otherwise.";
+
+  const briefCore =
+    `CLIENT: ${cleanName}\n` +
+    `PHRASE (EXACT): ${cleanPhrase}\n` +
+    `STACKED LINE LAYOUT:\n${layoutPreview}\n\n` +
+    `SCRIPT STYLE: ${style || "Not specified"}\n` +
+    `LINE FLOW / SHAPE: ${flow || "Straight / artist's choice"}\n` +
+    `EMPHASIS NOTES: ${emphasisText}\n` +
+    `PLACEMENT: ${placement || "Not specified"}\n` +
+    `APPROX SIZE: ${size || "Not specified"}\n` +
+    `COLOR PALETTE: ${color || "Black & grey / artist's choice"}`;
+
+  const artistView =
+    "ARTIST VIEW: SCRIPT LAYOUT SPEC\n" +
+    "--------------------------------\n" +
+    briefCore +
+    "\n--------------------------------\n";
+
+  let layoutInstruction = "";
+  if (lines.length <= 1) {
+    layoutInstruction = `single-line layout, text: "${cleanPhrase}"`;
+  } else {
+    const parts = lines.map((line, index) => `LINE ${index + 1}: "${line}"`).join("\n");
+    layoutInstruction = `${lines.length}-line stacked layout.\n${parts}`;
+  }
+
+  const prompt =
+    `high-resolution tattoo script design, ${lines.length || 1}-line layout.\n` +
+    layoutInstruction + `\n` +
+    `EXACT phrase: "${cleanPhrase}"\n` +
+    `Keep accurate.\n\n` +
+    `Script style: ${style || "Pure Chicano"}\n` +
+    `Flow: ${flow || "straight"}\n` +
+    `Placement context: ${placement || "flash sheet"}\n` +
+    `Color: ${color || "black"}\n` +
+    `White background.\n`;
+
+  const previewBlock =
+    `SCRIPT LAYOUT PREVIEW:\n` +
+    `----------------------\n${layoutPreview}\n----------------------`;
+
+  const combinedDisplay = artistView + "\n" + previewBlock;
+
+  lastOutputText = combinedDisplay + "\n\nAI PROMPT:\n" + prompt;
+
+  appendBrief(combinedDisplay, prompt, "Script Layout Artist View + Prompt generated.");
+}
+
+// =========================
+// INPUT HANDLER
+// =========================
+function handleUserInput(raw) {
+  const text = raw.trim();
+  if (!text) return;
+
+  appendMessage(text, "user");
+  userInput.value = "";
+
+  const mode = getMode();
+
+  // first entry
+  if (!sessionActive && !lastOutputText) {
+    if (activeModeKey === "concept") {
+      appendMessage(
+        "Locked in. I’ll ask a few quick questions to craft a clean brief.",
+        "bot"
+      );
+      mode.data.idea = text;
+    } else {
+      appendMessage(
+        "Got the exact phrase. Now I'll capture how you want it stacked and styled.",
+        "bot"
+      );
+      MODES.script.data.phrase = text;
+      updateScriptPreview();
+    }
+    sessionActive = true;
+    currentStepIndex = 1;
+    updateProgress();
+    askNextQuestion();
+    return;
+  }
+
+  // new idea after output
+  if (!sessionActive && lastOutputText) {
+    clearAllData();
+    sessionActive = true;
+    currentStepIndex = 1;
+
+    if (activeModeKey === "concept") {
+      appendMessage(
+        "New concept detected. Starting a new brief.",
+        "bot"
+      );
+      MODES.concept.data.idea = text;
+    } else {
+      appendMessage(
+        "New script phrase detected. Starting a new layout.",
+        "bot"
+      );
+      MODES.script.data.phrase = text;
+      updateScriptPreview();
+    }
+
+    lastOutputText = "";
+    updateProgress();
+    askNextQuestion();
+    return;
+  }
+
+  // ongoing steps
+  const stepKey = mode.steps[currentStepIndex];
+  mode.data[stepKey] = text;
+
+  if (activeModeKey === "script" && (stepKey === "layout" || stepKey === "phrase")) {
+    updateScriptPreview();
+  }
+
+  currentStepIndex++;
+  updateProgress();
+
+  if (currentStepIndex >= mode.steps.length) {
+    sessionActive = false;
+    if (activeModeKey === "concept") {
+      generateConceptOutput();
+      appendMessage("Concept brief ready.", "bot");
+    } else {
+      generateScriptOutput();
+      appendMessage("Script layout brief ready.", "bot");
+    }
+    updateProgress();
+  } else {
+    askNextQuestion();
+  }
+}
+
+// =========================
+// CLIPBOARD
+// =========================
+function copyOutput() {
+  if (!lastOutputText) {
+    appendMessage("No brief yet.", "system");
+    return;
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(lastOutputText).then(
+      () => appendMessage("Output copied.", "system"),
+      () => appendMessage("Clipboard blocked.", "system")
+    );
+  } else {
+    appendMessage("Clipboard unsupported.", "system");
+  }
+}
+
+// =========================
+// EVENTS + BOOT
+// =========================
+sendBtn.addEventListener("click", () => handleUserInput(userInput.value));
+
+userInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    handleUserInput(userInput.value);
+  }
+});
+
+copyBtn.addEventListener("click", copyOutput);
+resetBtn.addEventListener("click", resetSession);
+btnModeConcept.addEventListener("click", () => setMode("concept"));
+btnModeScript.addEventListener("click", () => setMode("script"));
+
+function bootMessage() {
+  appendMessage(
+    "SYSTEM ONLINE ›› MODE: CONCEPT. Type your tattoo idea to begin.",
+    "system"
+  );
+  updateProgress();
+  updateScriptPreview();
+}
+
+bootMessage();
+</script>
+<!-- ======================================================
+     V4 OVERLAYS (Final Integration)
+     ====================================================== -->
+<script>
+/* ======================================================
+   V4: Codex Sidebar Toggle (Desktop + Mobile)
+   ====================================================== */
+const codex = document.getElementById("codex");
+const codexToggle = document.getElementById("codexToggle");
+
+if (codex && codexToggle) {
+  codexToggle.addEventListener("click", () => {
+    codex.classList.toggle("collapsed");
+  });
+}
+
+/* ======================================================
+   V4: Composition Engine (Final Skeleton)
+   ====================================================== */
+const compositionProfiles = {
+  golden_spiral:      { id: "golden_spiral",      label: "Golden Spiral",      metadata: {} },
+  s_curve:            { id: "s_curve",            label: "S-Curve",            metadata: {} },
+  pyramid:            { id: "pyramid",            label: "Pyramid",            metadata: {} },
+  rule_of_thirds:     { id: "rule_of_thirds",     label: "Rule of Thirds",     metadata: {} },
+  double_diagonal:    { id: "double_diagonal",    label: "Double Diagonal",    metadata: {} },
+  radiating_center:   { id: "radiating_center",   label: "Radiating Center",   metadata: {} },
+  vertical_flow:      { id: "vertical_flow",      label: "Vertical Flow",      metadata: {} },
+  horizontal_flow:    { id: "horizontal_flow",    label: "Horizontal Flow",    metadata: {} }
+};
+
+function selectCompositionProfile(context = {}) {
+  const placement = (context.placement || "").toLowerCase();
+  const flow      = (context.flow || "").toLowerCase();
+
+  if (flow.includes("wave"))        return compositionProfiles.s_curve;
+  if (flow.includes("arched"))      return compositionProfiles.golden_spiral;
+  if (flow.includes("diagonal"))    return compositionProfiles.double_diagonal;
+
+  if (placement.includes("rib"))     return compositionProfiles.vertical_flow;
+  if (placement.includes("chest"))   return compositionProfiles.pyramid;
+  if (placement.includes("forearm")) return compositionProfiles.horizontal_flow;
+
+  return compositionProfiles.s_curve;  
+}
+
+/* ======================================================
+   V4: Spacing Engine (Final Skeleton)
+   ====================================================== */
+const spacingEngine = {
+  baseLetterSpacingMultiplier: 1.025,
+  flourishSpacingMultiplier:    1.03,
+  curlOverlapOffset:            0.04,
+  placementNegativeSpaceBoost: {
+    ribs:    1.06,
+    chest:   1.05,
+    sternum: 1.05
+  },
+
+  getPlacementBoost(p = "") {
+    p = p.toLowerCase();
+    if (p.includes("rib"))     return this.placementNegativeSpaceBoost.ribs;
+    if (p.includes("chest"))   return this.placementNegativeSpaceBoost.chest;
+    if (p.includes("sternum")) return this.placementNegativeSpaceBoost.sternum;
+    return 1.0;
+  },
+
+  getMultipliers(context = {}) {
+    const phraseLength = (context.phrase || "").length;
+    const lengthFactor = phraseLength > 40 ? 1.01 : 1.0;
+
+    return {
+      letterSpacingMultiplier:
+        this.baseLetterSpacingMultiplier * lengthFactor,
+      flourishSpacingMultiplier: this.flourishSpacingMultiplier,
+      curlOverlapOffset:         this.curlOverlapOffset,
+      placementNegativeSpaceMultiplier:
+        this.getPlacementBoost(context.placement)
+    };
+  }
+};
+
+/* ======================================================
+   V4: Animation Layer Controls
+   ====================================================== */
+const mainShell = document.getElementById("mainShell");
+
+function setIdleGlow(active) {
+  if (!mainShell) return;
+  if (active) mainShell.classList.add("shell-idle");
+  else        mainShell.classList.remove("shell-idle");
+}
+
+function triggerProcessingGlow() {
+  if (!mainShell) return;
+  mainShell.classList.add("shell-processing");
+  setTimeout(() => {
+    mainShell.classList.remove("shell-processing");
+  }, 1800);
+}
+
+// Idle glow ON at boot
+setIdleGlow(true);
+
+/* ======================================================
+   V4 FINAL WRAPPER FOR appendBrief (Option C)
+   ------------------------------------------------------
+   • Spacing Engine → prompt ONLY
+   • Composition metadata → brief ONLY
+   • Trigger animations
+   • DO NOT modify V3.1 logic
+   ====================================================== */
+const _appendBrief = appendBrief;
+appendBrief = function(briefText, promptText, labelOverride) {
+
+  // 1. Trigger processing animation
+  triggerProcessingGlow();
+  setIdleGlow(false);
+  setTimeout(() => setIdleGlow(true), 2100);
+
+  // 2. Extract context from MODES (Architect chose OPTION 2)
+  const mode = MODES[activeModeKey];
+  const context = {
+    phrase:    mode.data.phrase    || mode.data.idea || "",
+    placement: mode.data.placement || "",
+    flow:      mode.data.flow      || mode.data.style || "",
+    size:      mode.data.size      || ""
+  };
+
+  // 3. Select Composition Profile
+  const compProfile = selectCompositionProfile(context);
+
+  // 4. Apply Spacing Engine multipliers to prompt ONLY
+  const multipliers = spacingEngine.getMultipliers(context);
+
+  const spacedPrompt =
+    promptText +
+    `\n\n# SPACING ENGINE\n` +
+    `apply_letter_spacing:${multipliers.letterSpacingMultiplier}\n` +
+    `apply_flourish_spacing:${multipliers.flourishSpacingMultiplier}\n` +
+    `offset_curls:${multipliers.curlOverlapOffset}\n` +
+    `placement_negative_space:${multipliers.placementNegativeSpaceMultiplier}`;
+
+  // 5. Append Composition metadata to brief ONLY
+  const enhancedBrief =
+    briefText +
+    `\n\nCOMPOSITION NOTES:\n` +
+    `Selected Profile: ${compProfile.label}\n` +
+    `Metadata: auto-selected from placement/flow/phrase.\n`;
+
+  // 6. Call original V3.1 appendBrief (preserved)
+  _appendBrief(enhancedBrief, spacedPrompt, labelOverride);
+};
+</script>
+</body>
+</html>
+
+
