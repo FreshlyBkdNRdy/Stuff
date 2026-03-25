@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Sentinel Lock Screen</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <div class="scene">
+        <canvas id="sceneCanvas" width="1080" height="1920"></canvas>
+        <div class="scan-line"></div>
+        <div class="pulse"></div>
+        <div class="matrix-overlay"></div>
+        <p class="fallback" role="alert">
+          Drop your artwork into <code>assets/lock-subject.png</code> and reload.
+        </p>
+      </div>
+      <section class="controls">
+        <button id="startAnimation" type="button">🔁 Replay Animation</button>
+        <button id="recordClip" type="button">⬇️ Export 6s Video</button>
+        <p class="hint">
+          Place your image at <code>assets/lock-subject.png</code>. Use Export to
+          generate a video lock screen (WebM). Convert to MP4/Live Photo if
+          needed.
+        </p>
+      </section>
+    </main>
+    <script type="module" src="scripts/app.js"></script>
+  </body>
+</html>
